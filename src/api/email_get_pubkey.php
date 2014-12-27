@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2013, PGPSender.org
+ * Copyright (c) 2013 - 2015, PGPSender.org
  */
 require_once ("../include/ApiResponse.class.php");
 require_once ("../include/Keychain.class.php");

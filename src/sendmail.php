@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /*
- * Copyright (c) 2014, PGPSender.org
+ * Copyright (c) 2013 - 2015, PGPSender.org
  */
 
 require_once ("include/MailQueue.class.php");

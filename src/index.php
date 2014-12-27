@@ -1,9 +1,13 @@
 <?php
-	session_start ();
-	require_once ("include/Random.class.php");
+/*
+ * Copyright (c) 2013 - 2015, PGPSender.org
+ */
+session_start ();
+require_once ("include/Random.class.php");
 
-	$_SESSION["access_token"] = Random::read (16);
-	$_SESSION["hit_time"] = time ();
+$_SESSION["access_token"] = Random::read (16);
+$_SESSION["hit_time"] = time ();
+
 ?>
 <!DOCTYPE html>
 <html>
