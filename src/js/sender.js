@@ -33,6 +33,7 @@ function show_preview ()
 
 	if ( recipient_pubkey == null ){
 		$("#email_preview_store").hide ();
+		$("[name=in_email_preview_store_opt]").prop ("checked", false);
 		$("#email_preview_body").text (body);
 	} else {
 		$("#email_preview_store").show ();
@@ -137,8 +138,13 @@ function queue_email ()
 	var sender = $("[name=in_email_sender]").val ();
 	var subject = $("[name=in_email_subject]").val ();
 	var body = $("[name=in_email_body]").val ();
+	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
+	var store_pubkey = $("[name=in_email_preview_store_opt]").prop ("checked");
 
-	pgpsender.email_send (access_token, recipient, sender, subject, body, function (response){
+	if ( store_pubkey === false )
+		pubkey_armored = "";
+
+	pgpsender.email_send (access_token, recipient, sender, subject, body, pubkey_armored, function (response){
 		if ( response.status != 0 ){
 			show_failure ();
 			return;
