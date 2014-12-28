@@ -30,7 +30,7 @@ $_SESSION["hit_time"] = time ();
 				<div>
 					<div> <strong>Recipient</strong> <span id="alert_recipient" class="hidden"></span> </div>
 					<div>
-						<input type="text" name="in_email_recipient" placeholder="m.brod@example.com" style="width:20%;"> <button name="btn_email_paste_key" title="Paste public key"> <span class="fa fa-lock"></span> </button>
+						<input type="text" name="in_email_recipient" placeholder="m.brod@example.com" style="width:20%;"> <button name="btn_email_paste_key" title="Paste public key"> <span class="fa fa-lock"></span> </button> <span id="alert_pubkey_fetch" class="hidden"></span>
 					</div>
 
 					<div> <strong>Sender</strong> <span id="alert_sender" class="hidden"></span> </div>

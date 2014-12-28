@@ -49,6 +49,8 @@ function show_preview ()
 
 function show_form ()
 {
+	hide_alert ("alert_pubkey_fetch");
+
 	$("#email_preview").hide ();
 	$("#email_paste_key").hide ();
 	$("#email_success").hide ();
@@ -57,6 +59,8 @@ function show_form ()
 
 function show_public_key ()
 {
+	hide_alert ("alert_pubkey");
+
 	$("#email_preview").hide ();
 	$("#email_form").hide ();
 	$("#email_success").hide ();
@@ -80,27 +84,28 @@ function show_failure ()
 	$("#email_failure").show ();
 }
 
-function fetch_pubkey ()
+function fetch_public_key ()
 {
 	var pgpsender = new PGPSender ();
 	var recipient = $("[name=in_email_recipient]").val ();
 	var sender = $("[name=in_email_sender]").val ();
+	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
 
-	if ( (recipient.length == 0) || (sender.length == 0) )
+	if ( (recipient.length == 0) || (sender.length == 0) || (pubkey_armored.length > 0) )
 		return;
 
 	pgpsender.email_get_pubkey ("not_used", recipient, sender, function (response){
 		if ( response.status != 0 ){
-			// TODO: show alert!!!
-			console.log ("KEY NOT FETCHED: "+response.message);
 			return;
 		}
 
-		console.log ("KEY FETCHED: "+response.data);
+		$("[name=in_email_pk]").val (response.data);
+
+		show_alert ("alert_pubkey_fetch", "info", "* public key restored");
 	});
 }
 
-function load_pubkey ()
+function load_public_key ()
 {
 	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
 
@@ -112,10 +117,8 @@ function load_pubkey ()
 
 	recipient_pubkey = openpgp.key.readArmored (pubkey_armored);
 
-	console.log (recipient_pubkey);
-
 	if ( recipient_pubkey.keys.length == 0 ){
-		show_alert ("alert_pubkey", "error", recipient_pubkey.err[0]);
+		show_alert ("alert_pubkey", "error", "* Invalid key");
 		$("[name=in_email_pk]").select ();
 		recipient_pubkey = null;
 		return;
@@ -152,10 +155,10 @@ $(document).ready (function (){
 	$("[name=btn_email_preview_cancel]").click (show_form);
 	$("[name=btn_email_preview_send]").click (queue_email);
 	$("[name=btn_email_paste_key]").click (show_public_key);
-	$("[name=btn_email_paste_key_ok]").click (load_pubkey);
+	$("[name=btn_email_paste_key_ok]").click (load_public_key);
 	$("[name=btn_email_success_next]").click (function (){ location.reload (); });
 	$("[name=btn_email_failure_next]").click (queue_email);
-	$("[name=in_email_recipient]").change (fetch_pubkey);
-	$("[name=in_email_sender]").change (fetch_pubkey);
+	$("[name=in_email_recipient]").change (fetch_public_key);
+	$("[name=in_email_sender]").change (fetch_public_key);
 });
 
