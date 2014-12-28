@@ -1,4 +1,4 @@
-<a href="https://github.com/antagon/pgpsenderorg">Fork on GitHub</a>
+<a href="https://github.com/antagon/pgpsenderorg-sender">Fork on GitHub</a>
 
 <div style="float:right">
 	<a href="privacy.php">Privacy</a>
