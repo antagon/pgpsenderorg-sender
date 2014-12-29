@@ -4,5 +4,7 @@
 	<a href="privacy.php">Privacy</a>
 	<span class="delim">|</span>
 	<a href="contact.php">Contact</a>
+	<span class="delim">|</span>
+	<a href="http://www.openpgpjs.org/">OpenPGP.js</a>
 </div>
 
