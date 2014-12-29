@@ -32,8 +32,8 @@ function show_preview ()
 	$("#email_preview_subject").text (subject);
 
 	if ( recipient_pubkey == null ){
-		$("#email_preview_store").hide ();
 		$("[name=in_email_preview_store_opt]").prop ("checked", false);
+		$("#email_preview_store").hide ();
 		$("#email_preview_body").text (body);
 	} else {
 		$("#email_preview_store").show ();
@@ -102,6 +102,8 @@ function fetch_public_key ()
 
 		$("[name=in_email_pk]").val (response.data);
 
+		load_public_key ();
+
 		show_alert ("alert_pubkey_fetch", "info", "* public key restored");
 	});
 }
@@ -117,6 +119,8 @@ function load_public_key ()
 	}
 
 	recipient_pubkey = openpgp.key.readArmored (pubkey_armored);
+
+	console.log (recipient_pubkey);
 
 	if ( recipient_pubkey.keys.length == 0 ){
 		show_alert ("alert_pubkey", "error", "* Invalid key");
@@ -144,6 +148,25 @@ function queue_email ()
 	if ( store_pubkey === false )
 		pubkey_armored = "";
 
+	// Send encrypted message
+	if ( recipient_pubkey != null ){
+		openpgp.encryptMessage (recipient_pubkey.keys[0], body).then (function (body_armored){
+			body = body_armored;
+
+			pgpsender.email_send (access_token, recipient, sender, subject, body, pubkey_armored, function (response){
+				if ( response.status != 0 ){
+					show_failure ();
+					return;
+				}
+
+				show_success ();
+			});
+		});
+
+		return;
+	}
+
+	// Send plain-text message
 	pgpsender.email_send (access_token, recipient, sender, subject, body, pubkey_armored, function (response){
 		if ( response.status != 0 ){
 			show_failure ();
