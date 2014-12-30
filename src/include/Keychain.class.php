@@ -54,7 +54,7 @@ class Keychain {
 	private function exists ($recipient, $sender)
 	{
 		$sql = "SELECT rowid FROM ".$this::TABLE."
-					WHERE '".$this->db->escapeString ($recipient)."' AND '".$this->db->escapeString ($sender)."';";
+					WHERE recipient = '".$this->db->escapeString ($recipient)."' AND sender = '".$this->db->escapeString ($sender)."';";
 
 		$res = $this->db->query ($sql);
 		
