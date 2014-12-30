@@ -83,8 +83,10 @@ function show_preview ()
 
 	// Hide "store pubkey" checkbox
 	if ( recipient_pubkey == null ){
-		$("[name=in_email_preview_store_opt]").prop ("checked", false);
+		$("[name=in_email_preview_store_pubkey_opt]").prop ("checked", false);
 		$("#email_preview_store_pubkey").hide ();
+	} else {
+		$("#email_preview_store_pubkey").show ();
 	}
 
 	message_passthrough (body, (recipient_pubkey != null), function (message){
@@ -155,7 +157,7 @@ function queue_email ()
 	var subject = $("[name=in_email_subject]").val ();
 	var body = $("[name=in_email_body]").val ();
 	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
-	var store_pubkey = $("[name=in_email_preview_store_opt]").prop ("checked");
+	var store_pubkey = $("[name=in_email_preview_store_pubkey_opt]").prop ("checked");
 
 	if ( store_pubkey === false )
 		pubkey_armored = "";
