@@ -62,7 +62,7 @@ $_SESSION["hit_time"] = time ();
 				<div>
 					<strong>Subject:</strong> <span id="email_preview_subject"></span>
 					<div style="float:right">
-						<span id="email_preview_store"> <input type="checkbox" id="email_preview_store_opt" name="in_email_preview_store_opt"> <label for="email_preview_store_opt"> <small>Store public key</small> </label> </span>
+						<span id="email_preview_store_pubkey"> <input type="checkbox" id="email_preview_store_pubkey_opt" name="in_email_preview_store_pubkey_opt"> <label for="email_preview_store_pubkey_opt"> <small>Store public key</small> </label> </span>
 						<button name="btn_email_preview_cancel">Cancel</button> <button name="btn_email_preview_send">Send</button>
 					</div>
 				</div>

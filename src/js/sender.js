@@ -7,45 +7,17 @@ function is_email (emailAddress) {
 	return pattern.test (emailAddress);
 }
 
-function show_preview ()
+function message_passthrough (message, encrypt, callback)
 {
-	var recipient = $("[name=in_email_recipient]").val ();
-	var sender = $("[name=in_email_sender]").val ();
-	var subject = $("[name=in_email_subject]").val ();
-	var body = $("[name=in_email_body]").val ();
-
-	hide_alert ("alert_recipient");
-	hide_alert ("alert_sender");
-
-	if ( ! is_email (recipient) ){
-		show_alert ("alert_recipient", "error", "* Invalid format");
-		return;
-	}
-
-	if ( ! is_email (sender) ){
-		show_alert ("alert_sender", "error", "* Invalid format");
-		return;
-	}
-
-	$("#email_preview_recipient").text (recipient);
-	$("#email_preview_sender").text (sender);
-	$("#email_preview_subject").text (subject);
-
-	if ( recipient_pubkey == null ){
-		$("[name=in_email_preview_store_opt]").prop ("checked", false);
-		$("#email_preview_store").hide ();
-		$("#email_preview_body").text (body);
-	} else {
-		$("#email_preview_store").show ();
-		openpgp.encryptMessage (recipient_pubkey.keys[0], body).then (function (body_armored){
-			$("#email_preview_body").text (body_armored);
+	if ( encrypt ){
+		console.log ("Encrypting...");
+		openpgp.encryptMessage (recipient_pubkey.keys[0], message).then (function (message_encrypted){
+			callback (message_encrypted);
 		});
+	} else {
+		console.log ("Plain text...");
+		callback (message);
 	}
-
-	$("#email_form").hide ();
-	$("#email_paste_key").hide ();
-	$("#email_success").hide ();
-	$("#email_preview").show ();
 }
 
 function show_form ()
@@ -85,6 +57,72 @@ function show_failure ()
 	$("#email_failure").show ();
 }
 
+function show_preview ()
+{
+	var recipient = $("[name=in_email_recipient]").val ();
+	var sender = $("[name=in_email_sender]").val ();
+	var subject = $("[name=in_email_subject]").val ();
+	var body = $("[name=in_email_body]").val ();
+
+	hide_alert ("alert_recipient");
+	hide_alert ("alert_sender");
+
+	if ( ! is_email (recipient) ){
+		show_alert ("alert_recipient", "error", "* Invalid format");
+		return;
+	}
+
+	if ( ! is_email (sender) ){
+		show_alert ("alert_sender", "error", "* Invalid format");
+		return;
+	}
+
+	$("#email_preview_recipient").text (recipient);
+	$("#email_preview_sender").text (sender);
+	$("#email_preview_subject").text (subject);
+
+	// Hide "store pubkey" checkbox
+	if ( recipient_pubkey == null ){
+		$("[name=in_email_preview_store_opt]").prop ("checked", false);
+		$("#email_preview_store_pubkey").hide ();
+	}
+
+	message_passthrough (body, (recipient_pubkey != null), function (message){
+		$("#email_preview_body").text (message);
+
+		$("#email_form").hide ();
+		$("#email_paste_key").hide ();
+		$("#email_success").hide ();
+		$("#email_preview").show ();
+	});
+}
+
+function load_public_key ()
+{
+	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
+
+	if ( pubkey_armored.length == 0 ){
+		recipient_pubkey = null;
+		show_form ();
+		return;
+	}
+
+	recipient_pubkey = openpgp.key.readArmored (pubkey_armored);
+
+	console.log (recipient_pubkey);
+
+	if ( recipient_pubkey.keys.length == 0 ){
+		recipient_pubkey = null;
+		$("[name=in_email_pk]").select ();
+		show_alert ("alert_pubkey", "error", "* Invalid key");
+		return;
+	}
+
+	show_form ();
+
+	return;
+}
+
 function fetch_public_key ()
 {
 	var pgpsender = new PGPSender ();
@@ -108,32 +146,6 @@ function fetch_public_key ()
 	});
 }
 
-function load_public_key ()
-{
-	var pubkey_armored = $.trim ($("[name=in_email_pk]").val ());
-
-	if ( pubkey_armored.length == 0 ){
-		recipient_pubkey = null;
-		show_form ();
-		return;
-	}
-
-	recipient_pubkey = openpgp.key.readArmored (pubkey_armored);
-
-	console.log (recipient_pubkey);
-
-	if ( recipient_pubkey.keys.length == 0 ){
-		show_alert ("alert_pubkey", "error", "* Invalid key");
-		$("[name=in_email_pk]").select ();
-		recipient_pubkey = null;
-		return;
-	}
-
-	show_form ();
-
-	return;
-}
-
 function queue_email ()
 {
 	var pgpsender = new PGPSender ();
@@ -148,32 +160,15 @@ function queue_email ()
 	if ( store_pubkey === false )
 		pubkey_armored = "";
 
-	// Send encrypted message
-	if ( recipient_pubkey != null ){
-		openpgp.encryptMessage (recipient_pubkey.keys[0], body).then (function (body_armored){
-			body = body_armored;
+	message_passthrough (body, (recipient_pubkey != null), function (message){
+		pgpsender.email_send (access_token, recipient, sender, subject, message, pubkey_armored, function (response){
+			if ( response.status != 0 ){
+				show_failure ();
+				return;
+			}
 
-			pgpsender.email_send (access_token, recipient, sender, subject, body, pubkey_armored, function (response){
-				if ( response.status != 0 ){
-					show_failure ();
-					return;
-				}
-
-				show_success ();
-			});
+			show_success ();
 		});
-
-		return;
-	}
-
-	// Send plain-text message
-	pgpsender.email_send (access_token, recipient, sender, subject, body, pubkey_armored, function (response){
-		if ( response.status != 0 ){
-			show_failure ();
-			return;
-		}
-
-		show_success ();
 	});
 }
 
