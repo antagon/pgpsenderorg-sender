@@ -70,7 +70,7 @@ $_SESSION["hit_time"] = time ();
 				<div style="clear:both"></div>
 
 				<div>
-					<p id="email_preview_body" style="white-space:pre-wrap;"></p>
+					<p id="email_preview_body" class="wrapped text-justify"></p>
 				</div>
 			</div>
 
