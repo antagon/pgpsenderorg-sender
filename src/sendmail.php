@@ -34,6 +34,7 @@ $sendmail->Password = Config::SMTP_PASS;
 $sendmail->XMailer = "PGPSender.org";
 $sendmail->WordWrap = 80;
 $sendmail->isHTML (false);
+$sendmail->AllowEmpty = true;
 
 foreach ( $emails as $email ){
 	echo "sending: ".$email["sender"]." => ".$email["recipient"]." (".$email["subject"].")";
@@ -47,6 +48,8 @@ foreach ( $emails as $email ){
 	
 	if ( ! $sendmail->send () ){
 	   echo " [ERROR] ".$sendmail->ErrorInfo."\n";
+	   $sendmail->clearReplyTos ();
+	   $sendmail->clearAllRecipients ();
 	   continue;
 	}
 	
